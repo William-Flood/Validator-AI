@@ -1,0 +1,30 @@
+﻿<Window x:Class="NeuralNetWPF.NetLister"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:NeuralNetWPF"
+        mc:Ignorable="d"
+        Title="NetLister" Height="300" Width="300" Loaded="LoadLister">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <DataGrid Name="netList" Grid.ColumnSpan="3">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Name" Binding="{Binding name}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Percent Runs" Binding="{Binding percentRan}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Percent Correct" Binding="{Binding percentCorrect}"></DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button Grid.Row="1" Click="SelectLoad" Grid.Column="0">Load</Button>
+        <Button Grid.Row="1" Click="ClickDelete" Grid.Column="1">Delete</Button>
+        <Button Grid.Row="1" Click="ClickCancel" Grid.Column="2">Cancel</Button>
+    </Grid>
+</Window>

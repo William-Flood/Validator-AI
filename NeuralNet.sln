@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrainStructures", "BrainStructures\BrainStructures.csproj", "{2C4A5166-0C2D-43EE-92EC-F7B6E5EBB422}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataStructures", "DataStructures\DataStructures.csproj", "{F42C4CAE-A8FE-4D37-94B9-78A41BEF49A4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{C1725152-E023-4730-8A73-2D2E34047ECA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuralNetForms", "NeuralNetForms\NeuralNetForms.csproj", "{1FDA71BB-D656-48EB-8A09-42CB846F35A3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logic", "Logic\Logic.csproj", "{2D1410DB-0553-4995-9AD1-117D4C6A9E77}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Exceptions", "Exceptions\Exceptions.csproj", "{94C75EA5-6F87-462F-9861-79A3B56D2B3B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuralNetWPF", "NeuralNetWPF\NeuralNetWPF.csproj", "{7F4B5AE9-1112-4122-9D87-AC388B25DDA3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2C4A5166-0C2D-43EE-92EC-F7B6E5EBB422}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C4A5166-0C2D-43EE-92EC-F7B6E5EBB422}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C4A5166-0C2D-43EE-92EC-F7B6E5EBB422}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C4A5166-0C2D-43EE-92EC-F7B6E5EBB422}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F42C4CAE-A8FE-4D37-94B9-78A41BEF49A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F42C4CAE-A8FE-4D37-94B9-78A41BEF49A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F42C4CAE-A8FE-4D37-94B9-78A41BEF49A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F42C4CAE-A8FE-4D37-94B9-78A41BEF49A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1725152-E023-4730-8A73-2D2E34047ECA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1725152-E023-4730-8A73-2D2E34047ECA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1725152-E023-4730-8A73-2D2E34047ECA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1725152-E023-4730-8A73-2D2E34047ECA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FDA71BB-D656-48EB-8A09-42CB846F35A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FDA71BB-D656-48EB-8A09-42CB846F35A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FDA71BB-D656-48EB-8A09-42CB846F35A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FDA71BB-D656-48EB-8A09-42CB846F35A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D1410DB-0553-4995-9AD1-117D4C6A9E77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D1410DB-0553-4995-9AD1-117D4C6A9E77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D1410DB-0553-4995-9AD1-117D4C6A9E77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D1410DB-0553-4995-9AD1-117D4C6A9E77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94C75EA5-6F87-462F-9861-79A3B56D2B3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94C75EA5-6F87-462F-9861-79A3B56D2B3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94C75EA5-6F87-462F-9861-79A3B56D2B3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94C75EA5-6F87-462F-9861-79A3B56D2B3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F4B5AE9-1112-4122-9D87-AC388B25DDA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F4B5AE9-1112-4122-9D87-AC388B25DDA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F4B5AE9-1112-4122-9D87-AC388B25DDA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F4B5AE9-1112-4122-9D87-AC388B25DDA3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
