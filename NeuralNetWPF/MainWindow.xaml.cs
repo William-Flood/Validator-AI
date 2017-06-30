@@ -34,6 +34,10 @@ namespace NeuralNetWPF
             getReportsFrom = new TrainingReporter();
             InitializeComponent();
             this.mindController = new Controller(getReportsFrom, SetNetName);
+            if(mindController.HasFile())
+            {
+                TrainingFileLabel.Content = "DogTraining";
+            }
         }
 
         public void SetNetName(String name)
@@ -78,7 +82,8 @@ namespace NeuralNetWPF
             var fileDialog = new OpenFileDialog() {
                 DefaultExt=".txt",
                 //Filter= "Text files(*.txt) | *.txt | All files(*.*) | *.*",
-                Multiselect=false
+                Multiselect=false,
+                InitialDirectory = AppData.TrainingDocumentsPath
             };
             fileDialog.ShowDialog();
             if (fileDialog.FileName != null &&

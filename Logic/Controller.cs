@@ -84,6 +84,10 @@ namespace Logic
             this.nameDisplayer = nameDisplayer;
             RefreshList();
             sendReportTo = reporter;
+            if(FileManager.FileExists("DogTraining.txt"))
+            {
+                trainingDocumentName = "DogTraining.txt";
+            }
         }
 
         // Creates a new neural net.

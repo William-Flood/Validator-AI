@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using BrainStructures;
 
 namespace DataAccess
 {
@@ -23,6 +24,11 @@ namespace DataAccess
         public static void DeleteNet(String filePath)
         {
             File.Delete(filePath);
+        }
+
+        public static bool FileExists(String filePath)
+        {
+            return File.Exists(AppData.TrainingDocumentsPath + filePath);
         }
     }
 }
