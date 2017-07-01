@@ -56,6 +56,10 @@ namespace DataAccess
                                                             // will take further action from here
                 return netList;
             }
+            catch (DirectoryNotFoundException)
+            {
+                return netList;
+            }
             catch
             {
                 throw;

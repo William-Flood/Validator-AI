@@ -80,6 +80,7 @@ namespace Logic
 
         public Controller(TrainingReporter reporter, nameSetter nameDisplayer)
         {
+            FileManager.CreateFolders();
             netList = new LinkedList<NetListElement>();
             this.nameDisplayer = nameDisplayer;
             RefreshList();
@@ -143,13 +144,13 @@ namespace Logic
             netList = NetListManager.getNestList();
             if (0 == netList.Length && null != trainingDocumentName)
             {
-                netList.AddAtStart(new NetListElement("default", 0, 0));
+                try
+                {
                 if (loadedNet == null)
                 {
                     CreateNet();
                 }
-                try
-                {
+                    netList.AddAtStart(new NetListElement("default", 0, 0));
                     NetListManager.saveNetList(netList);
                     //NetXMLAccess.SaveNet("default.xml", loadedNet);
                 }

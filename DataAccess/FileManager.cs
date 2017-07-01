@@ -30,5 +30,18 @@ namespace DataAccess
         {
             return File.Exists(AppData.TrainingDocumentsPath + filePath);
         }
+
+        public static void CreateFolders()
+        {
+            if(!Directory.Exists(System.AppDomain.CurrentDomain.BaseDirectory + "trainingfiles"))
+            {
+                Directory.CreateDirectory(System.AppDomain.CurrentDomain.BaseDirectory + "trainingfiles");
+            }
+            if (!Directory.Exists(System.AppDomain.CurrentDomain.BaseDirectory + "savednets"))
+            {
+                Directory.CreateDirectory(System.AppDomain.CurrentDomain.BaseDirectory + "savednets");
+            }
+
+        }
     }
 }

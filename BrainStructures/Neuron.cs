@@ -389,6 +389,11 @@ namespace BrainStructures
             }
         }
 
+        public void Reset()
+        {
+            this.count = 0;
+        }
+
         /*                                                    // Provides a description of the synapses
                                                             // this neuron has
         public LinkedList<Synapse> giveSynapses(LinkedList<Neuron> intermediates, LinkedList<Neuron> motor)

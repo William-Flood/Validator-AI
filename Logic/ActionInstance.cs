@@ -178,6 +178,7 @@ namespace Logic
                     }
                     candidateNet.TotalCyclesTaken += trialsTaken;
                 }
+                candidateNet.Trainee.Reset();
             }
             runLatch = true;
         }

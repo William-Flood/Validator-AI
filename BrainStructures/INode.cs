@@ -24,5 +24,6 @@ namespace BrainStructures
         void NewSynapse(int motorIndex, INode toAdd, int sensoryIndex, int weight);
         void HardenNeuron();
         void Dealloc();
+        void Reset();
     }
 }

@@ -143,6 +143,9 @@ namespace DataAccess
                 netWriter.WriteEndElement(); //collective
                 netWriter.Flush();
             }
+            catch (DirectoryNotFoundException ex)
+            {
+            }
             catch
             {
                 throw;

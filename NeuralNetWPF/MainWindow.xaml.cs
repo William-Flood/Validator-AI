@@ -29,11 +29,20 @@ namespace NeuralNetWPF
         public MainWindow()
         {
 
-            AppData.SavedNeuronsPath = System.AppDomain.CurrentDomain.BaseDirectory + @"\" + "savednets" + @"\";
-            AppData.TrainingDocumentsPath = System.AppDomain.CurrentDomain.BaseDirectory + @"\" + "trainingfiles" + @"\";
+            AppData.SavedNeuronsPath = System.AppDomain.CurrentDomain.BaseDirectory + "savednets" + @"\";
+            AppData.TrainingDocumentsPath = System.AppDomain.CurrentDomain.BaseDirectory + "trainingfiles" + @"\";
             getReportsFrom = new TrainingReporter();
             InitializeComponent();
-            this.mindController = new Controller(getReportsFrom, SetNetName);
+            try
+            {
+                this.mindController = new Controller(getReportsFrom, SetNetName);
+            } catch(System.IO.DirectoryNotFoundException ex)
+            {
+                MessageBox.Show("Add trainingFiles folder inside Validator-AI\\NeuralNetWPF\\bin\\Debug");
+                this.Close();
+                return;
+            }
+            
             if(mindController.HasFile())
             {
                 TrainingFileLabel.Content = "DogTraining";

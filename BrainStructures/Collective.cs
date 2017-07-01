@@ -20,5 +20,13 @@ namespace BrainStructures
                 Components[i] = null;
             }
         }
+
+        public void Reset()
+        {
+            foreach(NetStructure component in Components)
+            {
+                component.Reset();
+            }
+        }
     }
 }

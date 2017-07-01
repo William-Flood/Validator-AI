@@ -79,6 +79,19 @@ namespace BrainStructures
 
         }
 
+        public void Reset()
+        {
+            foreach(INode intermediate in Intermediates)
+            {
+                intermediate.Reset();
+            }
+
+            foreach(INode motor in MotorList)
+            {
+                motor.Reset();
+            }
+        }
+
         
     }
 }
