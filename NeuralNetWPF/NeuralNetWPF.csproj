@@ -50,7 +50,7 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="Xceed.Wpf.Toolkit, Version=3.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Xceed.Wpf.Toolkit.dll</HintPath>
+      <HintPath>..\Dependencies\Xceed.Wpf.Toolkit.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
