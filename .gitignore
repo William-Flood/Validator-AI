@@ -193,3 +193,5 @@ Desktop.ini
 $RECYCLE.BIN/
 SnackOverFlowSolution/.vs/config/applicationhost.config
 SnackOverFlowDB/resultsLog.txt
+
+!Dependencies/
