@@ -85,7 +85,10 @@ namespace BrainStructures
             {
                 return null;
             }
-            set => throw new NotSupportedException();
+            set
+            {
+                throw new NotImplementedException();
+            }
         }
 
 
@@ -264,50 +267,6 @@ namespace BrainStructures
                 }
             }
         }
-        
-
-                                                            // Adds a new synapse to this neuron
-        public void NewSynapse(int motorIndex, INode toAdd, int sensoryIndex, int weight)
-        {
-            if(motorIndex != 0)
-            {
-                throw new ArgumentException("motorIndex out of range");
-            }
-            var target = toAdd.SensoryAt(sensoryIndex);
-            if(!toAdd.MarkedForDeletion)
-            {
-                var newNeuron = true;
-                TempSynapseList.ResetPointer();
-                bool scanning = true;
-                while (TempSynapseList.ElementsRemain && scanning)
-                {
-                    TempSynapseList.MoveUp();
-                    if (TempSynapseList.Value.Target == target)
-                    {
-                        newNeuron = false;
-                        if(-1*weight == TempSynapseList.Value.Weight)
-                        {
-                            TempSynapseList.Remove();
-                        }
-                        else
-                        {
-                            TempSynapseList.Value.Weight += weight;
-                        }
-                    }
-                }
-                if(newNeuron)
-                {
-                    TempSynapseList.AddAfter(new Synapse()
-                    {
-                        Target = target,
-                        Weight = weight,
-                        TargetSensoryIndex = sensoryIndex,
-                        MotorIndex = 0
-                    });
-                }
-            }
-
-        }
 
 
         // Adds a new synapse to this neuron
@@ -392,6 +351,16 @@ namespace BrainStructures
         public void Reset()
         {
             this.count = 0;
+        }
+
+
+
+        public void FillGraphArray(int thisIndex, int[,] graphArray)
+        {
+            foreach(Synapse synapse in SynapseList)
+            {
+                graphArray[thisIndex, synapse.ComponentIndex + 1] = synapse.Weight; 
+            }
         }
 
         /*                                                    // Provides a description of the synapses

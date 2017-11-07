@@ -338,6 +338,7 @@ namespace Logic
                         paragraph < PARAGRAPHS_BETWEEN_JUDEGEMENT;
                         paragraph++)
                     {
+                        var test = "test";
                         while ((false == testString.Equals("END OF PARAGRAPH")) &&
                             (false == testString.Equals("END OF FILE")) &&
                             continueTraining)
@@ -416,6 +417,7 @@ namespace Logic
                     loadedNet = judgedNets[0].Trainee;
                     const double GUESSTOLERANCE = .9;
                     const double SEARCHBACK = .3;
+                    const double SEARCHBACK_IMPROVEMENT_THRESHHOLD = 1;
                     /*if (trainingMutator.createBumper())
                     {
                         trainingMutator = new Mutator(.9, .9, .9, .9, .5);
@@ -449,7 +451,7 @@ namespace Logic
                         trainingMutator.adjustExitationOdds(.9);
                     }
                     else if (judgedNets[0].TimesCorrect ==
-                        judgedNets[(int)(judgedNets.Length * SEARCHBACK)].TimesCorrect)
+                        judgedNets[(int)(judgedNets.Length * SEARCHBACK)].TimesCorrect*SEARCHBACK_IMPROVEMENT_THRESHHOLD)
                     {
                         trainingMutator.adjustNeurogenesisOdds(.01);
                         trainingMutator.adjustLysingOdds(.1);

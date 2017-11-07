@@ -201,17 +201,21 @@ namespace DataAccess
                         foreach (XmlNode synapseXmlNode in sensoryXmlNode.SelectNodes("synapse_list")[0].ChildNodes)
                         {
                             INode target;
+                            var target_index = 0;
                             if("intermediates".Equals(synapseXmlNode.Attributes["target_in"].Value))
                             {
+                                target_index = Int32.Parse(synapseXmlNode.Attributes["target_index"].Value);
                                 target = currentNet.Intermediates[Int32.Parse(synapseXmlNode.Attributes["target_index"].Value)];
+                                
                             } else if ("motor".Equals(synapseXmlNode.Attributes["target_in"].Value))
                             {
+                                target_index = currentNet.Intermediates.Length + Int32.Parse(synapseXmlNode.Attributes["target_index"].Value);
                                 target = currentNet.MotorList[Int32.Parse(synapseXmlNode.Attributes["target_index"].Value)];
                             } else
                             {
                                 throw new ArgumentException("Invalid target_in attribute found.  Please do not create Skynet");
                             }
-                            currentNet.SensoryList[sensoryIndex].NewSynapse(0, target, Int32.Parse(synapseXmlNode.Attributes["target_sensory_index"].Value),Int32.Parse(synapseXmlNode.InnerXml));
+                            currentNet.SensoryList[sensoryIndex].NewSynapse(0, target, Int32.Parse(synapseXmlNode.Attributes["target_sensory_index"].Value),Int32.Parse(synapseXmlNode.InnerXml), target_index);
                         }
                         currentNet.SensoryList[sensoryIndex].HardenNeuron();
                         sensoryIndex++;
@@ -223,19 +227,22 @@ namespace DataAccess
                         foreach (XmlNode synapseXmlNode in intermediateXmlNode.SelectNodes("synapse_list")[0].ChildNodes)
                         {
                             INode target;
+                            var target_index = 0;
                             if ("intermediates".Equals(synapseXmlNode.Attributes["target_in"].Value))
                             {
+                                target_index = Int32.Parse(synapseXmlNode.Attributes["target_index"].Value);
                                 target = currentNet.Intermediates[Int32.Parse(synapseXmlNode.Attributes["target_index"].Value)];
                             }
                             else if ("motor".Equals(synapseXmlNode.Attributes["target_in"].Value))
                             {
+                                target_index = currentNet.Intermediates.Length + Int32.Parse(synapseXmlNode.Attributes["target_index"].Value);
                                 target = currentNet.MotorList[Int32.Parse(synapseXmlNode.Attributes["target_index"].Value)];
                             }
                             else
                             {
                                 throw new ArgumentException("Invalid target_in attribute found.  Please do not create Skynet");
                             }
-                            currentNet.Intermediates[intermediateIndex].NewSynapse(0, target, Int32.Parse(synapseXmlNode.Attributes["target_sensory_index"].Value), Int32.Parse(synapseXmlNode.InnerText));
+                            currentNet.Intermediates[intermediateIndex].NewSynapse(0, target, Int32.Parse(synapseXmlNode.Attributes["target_sensory_index"].Value), Int32.Parse(synapseXmlNode.InnerText),target_index);
                         }
                         currentNet.Intermediates[intermediateIndex].HardenNeuron();
                         intermediateIndex++;

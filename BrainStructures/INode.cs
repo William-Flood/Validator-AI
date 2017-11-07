@@ -21,9 +21,10 @@ namespace BrainStructures
         int? MadeFrom { get; set; }
         LinkedList<Synapse> TempSynapseList { get; set; }
         Synapse[] SynapseList { get; set; }
-        void NewSynapse(int motorIndex, INode toAdd, int sensoryIndex, int weight);
+        void NewSynapse(int motorIndex, INode toAdd, int sensoryIndex, int weight, int componentIndex);
         void HardenNeuron();
         void Dealloc();
         void Reset();
+        void FillGraphArray(int thisIndex, int[,] graphArray);
     }
 }

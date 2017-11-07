@@ -15,6 +15,7 @@
             <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
         <DockPanel Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">
             <Menu DockPanel.Dock="Top" Grid.Row="0" Grid.Column="0">
@@ -38,6 +39,5 @@
         <Label Grid.Row="1" Name="NetLabel" Grid.Column="1">None</Label>
         <Label Grid.Row="2" >Training File:</Label>
         <Label Grid.Row="2" Grid.Column="1" Name="TrainingFileLabel" >None</Label>
-
     </Grid>
 </Window>

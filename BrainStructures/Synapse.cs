@@ -12,6 +12,6 @@ namespace BrainStructures
         public INode Target { get; set; }
         public int TargetSensoryIndex { get; set; }
         public int MotorIndex { get; set; }
-        public int? ComponentIndex { get; set; }
+        public int ComponentIndex { get; set; }
     }
 }

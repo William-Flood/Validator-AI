@@ -40,7 +40,19 @@ namespace BrainStructures
         public bool MarkedForDeletion { get; private set; }
         public int? MadeFrom { get; set; }
         public LinkedList<Synapse> TempSynapseList { get; set; }
-        public Synapse[] SynapseList { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        public Synapse[] SynapseList
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
 
         public CompoundNode()
         {
@@ -84,7 +96,7 @@ namespace BrainStructures
             throw new NotImplementedException();
         }
 
-        public void NewSynapse(int motorIndex, INode toAdd, int sensoryIndex, int weight)
+        public void NewSynapse(int motorIndex, INode toAdd, int sensoryIndex, int weight, int componentIndex)
         {
             throw new NotImplementedException();
         }
@@ -100,6 +112,11 @@ namespace BrainStructures
         }
 
         public void Reset()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void FillGraphArray(int thisIndex, int[,] graphArray)
         {
             throw new NotImplementedException();
         }

@@ -29,6 +29,8 @@ namespace BrainStructures
         public int NetworkLevel { get; set; }
 
         int compoundNodeID = 0;
+
+        int[,] grid;
         
 
         public CompoundNode CreateCompoundNode()
@@ -91,6 +93,23 @@ namespace BrainStructures
                 motor.Reset();
             }
         }
+
+        public void Griddify()
+        {
+            grid = new int[SensoryList.Length + Intermediates.Length, Intermediates.Length + MotorList.Length + 1];
+            int nodeIndex = 0;
+            foreach(Neuron sensory in SensoryList)
+            {
+                sensory.FillGraphArray(nodeIndex, grid);
+                nodeIndex++;
+            }
+            foreach(INode intermediate in Intermediates)
+            {
+                intermediate.FillGraphArray(nodeIndex, grid);
+                nodeIndex++;
+            }
+        }
+        
 
         
     }

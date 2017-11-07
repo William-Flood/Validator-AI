@@ -76,7 +76,7 @@ namespace Logic
             {
                 temMotorList.AddAtStart(motor);
             }
-            var canConnectTo = toMutate.TempIntermediates + temMotorList;
+            var canConnectTo = (toMutate.TempIntermediates + temMotorList).ToArray();
             foreach(Neuron sensory in toMutate.SensoryList)
             {
                 MutateSynapses(sensory, canConnectTo);
@@ -88,6 +88,7 @@ namespace Logic
                 INode mightMutate = toMutate.TempIntermediates.Value;
                 MutateSynapses(mightMutate, canConnectTo);
             }
+            toMutate.Griddify();
         }
 
         /*
@@ -110,7 +111,7 @@ namespace Logic
         }*/
 
                                                             // Mutates an individual neuron
-        void MutateSynapses(INode mightMutate, LinkedList<INode> canConnectTo)
+        void MutateSynapses(INode mightMutate, INode[] canConnectTo)
         {
             var nodeSynapseList = mightMutate.TempSynapseList;
             while (nodeSynapseList.ElementsRemain)
@@ -127,24 +128,12 @@ namespace Logic
 
             if (rng.NextDouble() < oddsOfNewSynapses)
             {
-                canConnectTo.ResetPointer();
                 int j = canConnectTo.Length;
-                bool latch = canConnectTo.ElementsRemain;
-                while (latch)
-                {
-                    canConnectTo.MoveUp();
-                    latch = canConnectTo.ElementsRemain;
-                    double checkAgainst = rng.NextDouble();
-                    if (checkAgainst < 1.0 / j)
-                    {
-                        var newMotorIndex = rng.Next(mightMutate.MotorCount);
-                        var sensosryIndex = rng.Next(canConnectTo.Value.SensoryCount);
-                        mightMutate.NewSynapse(newMotorIndex, canConnectTo.Value, sensosryIndex, rng.NextDouble() < oddsOfExitation ? 1:-1);
-                        latch = false;
-                    }
-                    j--;
-                }
-                canConnectTo.ResetPointer();
+                int componentIndex = rng.Next(canConnectTo.Length);
+                var targetNode = canConnectTo[componentIndex];
+                var newMotorIndex = rng.Next(mightMutate.MotorCount);
+                var sensosryIndex = rng.Next(targetNode.SensoryCount);
+                mightMutate.NewSynapse(newMotorIndex, targetNode, sensosryIndex, rng.NextDouble() < oddsOfExitation ? 1 : -1,componentIndex);
             }
         }
 
