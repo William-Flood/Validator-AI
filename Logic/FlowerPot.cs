@@ -33,7 +33,7 @@ namespace Logic
                 throw;
             }
             firstNet.TempIntermediates = new LinkedList<INode>();
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 25; i++)
             {
                 firstNet.TempIntermediates.AddAtStart(new Neuron());
             }
