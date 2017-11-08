@@ -89,7 +89,7 @@ namespace NeuralNetWPF
             {
                 TrainingFileLabel.Content = "DogTraining";
             }
-            testGPU();
+            //testGPU();
         }
 
         void testGPU()

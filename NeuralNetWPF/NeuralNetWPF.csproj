@@ -123,9 +123,6 @@
     <Content Include="CUDANetRunner.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="CUDANetRunner.pdb">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="DllImportTest.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

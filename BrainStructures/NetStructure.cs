@@ -32,6 +32,36 @@ namespace BrainStructures
 
         int[,] grid;
         
+        public int[,] SensoryGrid
+        {
+            get
+            {
+                grid = new int[SensoryList.Length, Intermediates.Length + MotorList.Length];
+                int nodeIndex = 0;
+                foreach (Neuron sensory in SensoryList)
+                {
+                    sensory.FillGraphArray(nodeIndex, grid);
+                    nodeIndex++;
+                }
+                return grid;
+            }
+        }
+
+
+        public int[,] IntermediateGrid
+        {
+            get
+            {
+                grid = new int[Intermediates.Length, Intermediates.Length + MotorList.Length];
+                int nodeIndex = 0;
+                foreach (Neuron neuron in Intermediates)
+                {
+                    neuron.FillGraphArray(nodeIndex, grid);
+                    nodeIndex++;
+                }
+                return grid;
+            }
+        }
 
         public CompoundNode CreateCompoundNode()
         {
