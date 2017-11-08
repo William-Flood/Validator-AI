@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controller.cs" />
+    <Compile Include="CUDAWrapper.cs" />
     <Compile Include="EvaluatedNetwork.cs" />
     <Compile Include="FlowerPot.cs" />
     <Compile Include="LinearNetRunner.cs" />

@@ -53,6 +53,20 @@
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BrainStructures\BrainStructures.csproj">
+      <Project>{2c4a5166-0c2d-43ee-92ec-f7b6e5ebb422}</Project>
+      <Name>BrainStructures</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataStructures\DataStructures.csproj">
+      <Project>{f42c4cae-a8fe-4d37-94b9-78a41bef49a4}</Project>
+      <Name>DataStructures</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Logic\Logic.csproj">
+      <Project>{2d1410db-0553-4995-9ad1-117d4c6a9e77}</Project>
+      <Name>Logic</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
