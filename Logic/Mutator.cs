@@ -88,7 +88,6 @@ namespace Logic
                 INode mightMutate = toMutate.TempIntermediates.Value;
                 MutateSynapses(mightMutate, canConnectTo);
             }
-            toMutate.Griddify();
         }
 
         /*

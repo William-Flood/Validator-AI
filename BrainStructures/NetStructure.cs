@@ -36,14 +36,14 @@ namespace BrainStructures
         {
             get
             {
-                grid = new int[SensoryList.Length, Intermediates.Length + MotorList.Length];
+                var sensoryGrid = new int[SensoryList.Length, Intermediates.Length + MotorList.Length];
                 int nodeIndex = 0;
                 foreach (Neuron sensory in SensoryList)
                 {
-                    sensory.FillGraphArray(nodeIndex, grid);
+                    sensory.FillGraphArray(nodeIndex, sensoryGrid);
                     nodeIndex++;
                 }
-                return grid;
+                return sensoryGrid;
             }
         }
 
@@ -52,14 +52,14 @@ namespace BrainStructures
         {
             get
             {
-                grid = new int[Intermediates.Length, Intermediates.Length + MotorList.Length];
+                var intermediateGrid = new int[Intermediates.Length, Intermediates.Length + MotorList.Length];
                 int nodeIndex = 0;
                 foreach (Neuron neuron in Intermediates)
                 {
-                    neuron.FillGraphArray(nodeIndex, grid);
+                    neuron.FillGraphArray(nodeIndex, intermediateGrid);
                     nodeIndex++;
                 }
-                return grid;
+                return intermediateGrid;
             }
         }
 
