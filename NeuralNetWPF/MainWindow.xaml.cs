@@ -72,8 +72,8 @@ namespace NeuralNetWPF
         public MainWindow()
         {
 
-            AppData.SavedNeuronsPath = System.AppDomain.CurrentDomain.BaseDirectory + "savednets" + @"\";
-            AppData.TrainingDocumentsPath = System.AppDomain.CurrentDomain.BaseDirectory + "trainingfiles" + @"\";
+            AppData.SavedNeuronsPath = System.AppDomain.CurrentDomain.BaseDirectory + @"savednets\";
+            AppData.TrainingDocumentsPath = System.AppDomain.CurrentDomain.BaseDirectory + @"trainingfiles\";
             getReportsFrom = new TrainingReporter();
             InitializeComponent();
             try
