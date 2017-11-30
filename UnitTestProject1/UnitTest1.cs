@@ -51,10 +51,56 @@ namespace UnitTestProject1
             var motorCount = 2;
             //var blockCount = CUDAWrapper.CalculateBlockCount(motorCount + maxIntermediateLength);
             var blockCount = 4;
-            var sensoryGridCount = sensoryCount * (maxIntermediateLength + motorCount) * netsToTest.Length;
-            var intermediateGridCount = maxIntermediateLength * (maxIntermediateLength + motorCount) * netsToTest.Length;
+            var connectedCount = maxIntermediateLength + motorCount;
+            var sensoryGridCount = sensoryCount * (connectedCount) * netsToTest.Length;
+            var intermediateGridCount = maxIntermediateLength * (connectedCount) * netsToTest.Length;
             var tallyGridCount = (maxIntermediateLength + motorCount) * netsToTest.Length;
             var flatNetGrid = new int[sensoryGridCount + intermediateGridCount + tallyGridCount + tallyGridCount*blockCount];
+
+            var SensoryBrick = new int[sensoryCount, connectedCount, netsToTest.Length];
+            var IntermediateBrick = new int[maxIntermediateLength, connectedCount, netsToTest.Length];
+            var tempTallyGrid = new int[connectedCount, netsToTest.Length];
+            var tallyGrid = new int[connectedCount, netsToTest.Length];
+            for (var netIterator =  0; netIterator<netsToTest.Length; netIterator++ )
+            {
+                var sensoryList = netsToTest[netIterator].SensoryGrid;
+
+                for (var firingIterator = 0; firingIterator < sensoryList.GetLength(0); firingIterator++)
+                {
+                    for(var targetIterator = 0; targetIterator< sensoryList.GetLength(1); targetIterator++)
+                    {
+                        SensoryBrick[targetIterator, firingIterator, netIterator] = sensoryList[firingIterator, targetIterator];
+                        flatNetGrid[targetIterator + firingIterator * connectedCount + netIterator * sensoryCount * connectedCount] = sensoryList[firingIterator, targetIterator];
+                    }
+                }
+            }
+
+            var flatIntermedidateStart = netsToTest.Length * sensoryCount * connectedCount;
+            for (var netIterator = 0; netIterator < netsToTest.Length; netIterator++)
+            {
+                var intermediateList = netsToTest[netIterator].IntermediateGrid;
+
+                for (var firingIterator = 0; firingIterator < intermediateList.GetLength(0); firingIterator++)
+                {
+                    for (var targetIterator = 0; targetIterator < intermediateList.GetLength(1); targetIterator++)
+                    {
+                        IntermediateBrick[targetIterator, firingIterator, netIterator] = intermediateList[firingIterator, targetIterator];
+                        flatNetGrid[flatIntermedidateStart + targetIterator + firingIterator * connectedCount + netIterator * sensoryCount * connectedCount] = intermediateList[firingIterator, targetIterator];
+                    }
+                }
+            }
+
+            var rng = new Random();
+            var sensoryInput = new int[50];
+            for(int i = 0; i< sensoryInput.Length; i++)
+            {
+                sensoryInput[i] = rng.Next(sensoryCount);
+            }
+
+            foreach(var inputValue in sensoryInput)
+            {
+                LinearNetRunner.RunNet(SensoryBrick, IntermediateBrick, tallyGrid, inputValue, 20);
+            }
         }
     }
 }

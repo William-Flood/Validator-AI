@@ -359,7 +359,7 @@ namespace BrainStructures
         {
             foreach(Synapse synapse in SynapseList)
             {
-                graphArray[thisIndex, synapse.ComponentIndex + 1] = synapse.Weight; 
+                graphArray[synapse.ComponentIndex, thisIndex] = synapse.Weight; 
             }
         }
 

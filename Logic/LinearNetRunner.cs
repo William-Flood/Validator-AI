@@ -7,33 +7,43 @@ using BrainStructures;
 
 namespace Logic
 {
-    static class LinearNetRunner
+    public static class LinearNetRunner
     {
-        static void RunNet(int[,] sensoryNet, int[,] intermediateNet, int[] tally, int sensoryIndex, int threshhold)
+        public static void RunNet(int[,,] sensoryNet, int[,,] intermediateNet, int[,] tally, int sensoryIndex, int threshhold)
         {
-            int[] tempTally = new int[tally.Length];
-            for(int sensorySynapse = 0; sensorySynapse < sensoryNet.GetLength(0); sensorySynapse++)
+            int[,] tempTally = new int[tally.Length, sensoryNet.GetLength(2)];
+            for(int netIndex = 0; netIndex < sensoryNet.GetLength(2); netIndex++)
             {
-                tempTally[sensorySynapse] = sensoryNet[sensorySynapse, sensoryIndex];
-            }
-            for(int intermediateNeuron = 0; intermediateNeuron < intermediateNet.GetLength(1); intermediateNeuron++)
-            {
-                if(tally[intermediateNeuron] > threshhold)
+                for(int sensorySynapse = 0; sensorySynapse < sensoryNet.GetLength(0); sensorySynapse++)
                 {
-                    for (int intermediateSynapse = 0; intermediateSynapse < intermediateNet.GetLength(0); intermediateSynapse++)
-                    {
-                        tempTally[intermediateSynapse] += intermediateNet[intermediateSynapse, intermediateNeuron];
-                    }
-                    tally[intermediateNeuron] = 0;
+                    tempTally[sensorySynapse, netIndex] = sensoryNet[sensorySynapse, sensoryIndex, netIndex];
                 }
-            }
-
-            for(int i = 0; i<tally.Length; i++)
-            {
-                tally[i] += tempTally[i];
-                if(0 < tally[i])
+                for(int cycleIndex = 0; cycleIndex<11; cycleIndex++)
                 {
-                    tally[i] = 0;
+                    for(int intermediateNeuron = 0; intermediateNeuron < intermediateNet.GetLength(1); intermediateNeuron++)
+                    {
+                        if(tally[intermediateNeuron, netIndex] > threshhold)
+                        {
+                            for (int intermediateSynapse = 0; intermediateSynapse < intermediateNet.GetLength(0); intermediateSynapse++)
+                            {
+                                tempTally[intermediateSynapse, netIndex] += intermediateNet[intermediateSynapse, intermediateNeuron, netIndex];
+                            }
+                            tally[intermediateNeuron, netIndex] = 0;
+                        }
+                    }
+
+                    for(int i = 0; i<tally.Length; i++)
+                    {
+                        if (threshhold >= tally[i, netIndex])
+                        {
+                            tally[i, netIndex] = 0;
+                        }
+                        tally[i, netIndex] += tempTally[i, netIndex];
+                        if(0 < tally[i, netIndex])
+                        {
+                            tally[i, netIndex] = 0;
+                        }
+                    }
                 }
             }
         }

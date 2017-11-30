@@ -36,7 +36,7 @@ namespace BrainStructures
         {
             get
             {
-                var sensoryGrid = new int[SensoryList.Length, Intermediates.Length + MotorList.Length];
+                var sensoryGrid = new int[Intermediates.Length + MotorList.Length, SensoryList.Length];
                 int nodeIndex = 0;
                 foreach (Neuron sensory in SensoryList)
                 {
@@ -52,7 +52,7 @@ namespace BrainStructures
         {
             get
             {
-                var intermediateGrid = new int[Intermediates.Length, Intermediates.Length + MotorList.Length];
+                var intermediateGrid = new int[Intermediates.Length + MotorList.Length, Intermediates.Length];
                 int nodeIndex = 0;
                 foreach (Neuron neuron in Intermediates)
                 {
