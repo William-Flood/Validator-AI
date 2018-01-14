@@ -53,6 +53,7 @@ dlldata.c
 *.pidb
 *.svclog
 *.scc
+*.dll
 
 #Save files for neural nets
 *.xml
