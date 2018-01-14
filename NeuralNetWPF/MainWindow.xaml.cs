@@ -25,46 +25,7 @@ namespace NeuralNetWPF
     public partial class MainWindow : Window
     {
 
-
-
-        [DllImport("CUDANetRunner.dll", CallingConvention = CallingConvention.Cdecl)]
-        static extern int blockSize();
-
-        [DllImport("CUDANetRunner.dll", CallingConvention = CallingConvention.Cdecl)]
-        static extern void release(IntPtr toRelease);
-
-        [DllImport("CUDANetRunner.dll", CallingConvention = CallingConvention.Cdecl)]
-        static extern void cuda_release(IntPtr toRelease);
-
-        [DllImport("CUDANetRunner.dll", CallingConvention = CallingConvention.Cdecl)]
-        static extern IntPtr declare_transfer_block(int totalSize);
-
-        [DllImport("CUDANetRunner.dll", CallingConvention = CallingConvention.Cdecl)]
-        static extern IntPtr establish_net_block(IntPtr toEstablish, int totalSize);
-
-        [DllImport("CUDANetRunner.dll", CallingConvention = CallingConvention.Cdecl)]
-        static extern IntPtr findIntermediateBlock(IntPtr sensoryBlock, int sensoryCount, int intermediateCount, int motorCount, int netCount);
-
-        [DllImport("CUDANetRunner.dll", CallingConvention = CallingConvention.Cdecl)]
-        static extern IntPtr findTallyBlock(IntPtr intermediateBlock, int intermediateCount, int motorCount, int netCount);
-
-        [DllImport("CUDANetRunner.dll", CallingConvention = CallingConvention.Cdecl)]
-        static extern IntPtr findTempTallyBlock(IntPtr tallyBlock, int intermediateCount, int motorCount, int netCount);
-
-        [DllImport("CUDANetRunner.dll", CallingConvention = CallingConvention.Cdecl)]
-        static extern void runCycle(int sensoryCount, int intermediateCount, int motorCount, int netCount, IntPtr sensoryBlock, IntPtr intermediateBlock, IntPtr tallyBlock, IntPtr tempTally, int sensoryIndex);
-
-        [DllImport("CUDANetRunner.dll", CallingConvention = CallingConvention.Cdecl)]
-        static extern IntPtr getTally(IntPtr tallyBlock, int tallyingNeuronCount);
-
-        [DllImport("CUDANetRunner.dll", CallingConvention = CallingConvention.Cdecl)]
-        static extern IntPtr getNet(IntPtr encodedNet, int size);
-
-        [DllImport("CUDANetRunner.dll", CallingConvention = CallingConvention.Cdecl)]
-        static extern int CalculateBlockCount(int firingNeuronCount);
-
-
-
+        
 
 
         Controller mindController;
@@ -92,88 +53,88 @@ namespace NeuralNetWPF
             //testGPU();
         }
 
-        void testGPU()
-        {
-            //int sensoryCount = 1;
-            //int intermediateCount = 4;
-            //int motorCount = 1;
-            //int netCount = 2;
-            int sensoryCount = 1;
-            int intermediateCount = 4;
-            int motorCount = 1;
-            int netCount = 2;
-            //int sensoryCount = 1;
-            //int intermediateCount = 4;
-            //int motorCount = 1;
-            //int netCount = 1;
-            var sensoryBlock = new int[] {
-                1, 0, 3, 0, 0, //0, 0, 0, 0, 0,
+        //void testGPU()
+        //{
+        //    //int sensoryCount = 1;
+        //    //int intermediateCount = 4;
+        //    //int motorCount = 1;
+        //    //int netCount = 2;
+        //    int sensoryCount = 1;
+        //    int intermediateCount = 4;
+        //    int motorCount = 1;
+        //    int netCount = 2;
+        //    //int sensoryCount = 1;
+        //    //int intermediateCount = 4;
+        //    //int motorCount = 1;
+        //    //int netCount = 1;
+        //    var sensoryBlock = new int[] {
+        //        1, 0, 3, 0, 0, //0, 0, 0, 0, 0,
 
-                0, 0, 0, 0, 0//, 0, 0, 0, 0, 0
-            };
-            var intermediateBlock = new int[] {
-                  0, 1, 0, 0, 0//, 0, 0, 0, 0, 0
-                , 0, 0, 0, 0, 0//, 0, 0, 0, 0, 0
-                , 0, 0, 0, 0, 4//, 0, 0, 0, 0, 0
-                , 0, 0, 0, 0, 0//, 0, 0, 0, 0, 0,
-                               //
-                , 0, 1, 0, 0, 0//, 0, 0, 0, 0, 0
-                , 0, 0, 0, 0, 0//, 0, 0, 0, 0, 0
-                , 0, 0, 0, 0, 4//, 0, 0, 0, 0, 0
-                , 0, 0, 0, 0, 0//, 0, 0, 0, 0, 0
-            };
-            var tallyCount = (motorCount + intermediateCount) * netCount;
-            var tallyBlock = new int[tallyCount];
-            var tempTallyCount = tallyBlock.Length * CalculateBlockCount(motorCount + intermediateCount);
-            var tempTallyBlock = new int[tempTallyCount];
-            var encodedNet = new int[sensoryBlock.Length + intermediateBlock.Length + tallyBlock.Length + tempTallyBlock.Length];
-            var encodingIndex = 0;
-            foreach(var sensorySynapse in sensoryBlock)
-            {
-                encodedNet[encodingIndex] = sensorySynapse;
-                //encodedNet[encodingIndex] = 1;
-                encodingIndex++;
-            }
-            foreach (var intermediateSynapse in intermediateBlock)
-            {
-                encodedNet[encodingIndex] = intermediateSynapse;
-                //encodedNet[encodingIndex] = 1;
-                encodingIndex++;
-            }
-            for (int i = 0; i < tallyCount; i++)
-            {
-                encodedNet[encodingIndex] = 0;
-                encodingIndex++;
-            }
-            encodedNet[sensoryBlock.Length + intermediateBlock.Length + 2] = 19;
-            for (int i = 0; i< tempTallyCount; i++)
-            {
-                encodedNet[encodingIndex] = -1;
-                encodingIndex++;
-            }
-            IntPtr netTransferBlock = declare_transfer_block(encodedNet.Length);
-            Marshal.Copy(encodedNet, 0, netTransferBlock, encodedNet.Length);
-            IntPtr cudaSensoryBlock = establish_net_block(netTransferBlock, encodedNet.Length);
-            IntPtr cudaIntermediateBlock = findIntermediateBlock(cudaSensoryBlock, sensoryCount, intermediateCount, motorCount, netCount);
-            var cudaTallyBlock = findTallyBlock(cudaIntermediateBlock, intermediateCount, motorCount, netCount);
-            var cudaTempTallyBlock = findTempTallyBlock(cudaTallyBlock, intermediateCount, motorCount, netCount);
-            runCycle(sensoryCount, intermediateCount, motorCount, netCount, cudaSensoryBlock, cudaIntermediateBlock, cudaTallyBlock, cudaTempTallyBlock, 0);
-            //runCycle(sensoryCount, intermediateCount, motorCount, netCount, cudaSensoryBlock, cudaIntermediateBlock, cudaTallyBlock, cudaTempTallyBlock, 0);
-            var returnedTally = getNet(cudaTallyBlock, tallyBlock.Length);
-            var tallyResults = new int[tallyBlock.Length];
-            var returnedTempTally = getNet(cudaTempTallyBlock, tempTallyBlock.Length);
-            var tempTallyResults = new int[tempTallyBlock.Length];
-            var returnedNet = getNet(cudaSensoryBlock, encodedNet.Length);
-            var netResults = new int[encodedNet.Length];
-            Marshal.Copy(returnedTally, tallyResults, 0, tallyBlock.Length);
-            Marshal.Copy(returnedTempTally, tempTallyResults, 0, tempTallyBlock.Length);
-            Marshal.Copy(returnedNet, netResults, 0, encodedNet.Length);
-            release(returnedTally);
-            release(returnedNet);
-            release(netTransferBlock);
-            release(returnedTempTally);
-            cuda_release(cudaSensoryBlock);
-        }
+        //        0, 0, 0, 0, 0//, 0, 0, 0, 0, 0
+        //    };
+        //    var intermediateBlock = new int[] {
+        //          0, 1, 0, 0, 0//, 0, 0, 0, 0, 0
+        //        , 0, 0, 0, 0, 0//, 0, 0, 0, 0, 0
+        //        , 0, 0, 0, 0, 4//, 0, 0, 0, 0, 0
+        //        , 0, 0, 0, 0, 0//, 0, 0, 0, 0, 0,
+        //                       //
+        //        , 0, 1, 0, 0, 0//, 0, 0, 0, 0, 0
+        //        , 0, 0, 0, 0, 0//, 0, 0, 0, 0, 0
+        //        , 0, 0, 0, 0, 4//, 0, 0, 0, 0, 0
+        //        , 0, 0, 0, 0, 0//, 0, 0, 0, 0, 0
+        //    };
+        //    var tallyCount = (motorCount + intermediateCount) * netCount;
+        //    var tallyBlock = new int[tallyCount];
+        //    var tempTallyCount = tallyBlock.Length * CUDAWrapper.CalculateBlockCount(motorCount + intermediateCount);
+        //    var tempTallyBlock = new int[tempTallyCount];
+        //    var encodedNet = new int[sensoryBlock.Length + intermediateBlock.Length + tallyBlock.Length + tempTallyBlock.Length];
+        //    var encodingIndex = 0;
+        //    foreach(var sensorySynapse in sensoryBlock)
+        //    {
+        //        encodedNet[encodingIndex] = sensorySynapse;
+        //        //encodedNet[encodingIndex] = 1;
+        //        encodingIndex++;
+        //    }
+        //    foreach (var intermediateSynapse in intermediateBlock)
+        //    {
+        //        encodedNet[encodingIndex] = intermediateSynapse;
+        //        //encodedNet[encodingIndex] = 1;
+        //        encodingIndex++;
+        //    }
+        //    for (int i = 0; i < tallyCount; i++)
+        //    {
+        //        encodedNet[encodingIndex] = 0;
+        //        encodingIndex++;
+        //    }
+        //    encodedNet[sensoryBlock.Length + intermediateBlock.Length + 2] = 19;
+        //    for (int i = 0; i< tempTallyCount; i++)
+        //    {
+        //        encodedNet[encodingIndex] = -1;
+        //        encodingIndex++;
+        //    }
+        //    IntPtr netTransferBlock = CUDAWrapper.declare_transfer_block(encodedNet.Length);
+        //    Marshal.Copy(encodedNet, 0, netTransferBlock, encodedNet.Length);
+        //    IntPtr cudaSensoryBlock = CUDAWrapper.establish_net_block(netTransferBlock, encodedNet.Length);
+        //    IntPtr cudaIntermediateBlock = CUDAWrapper.findIntermediateBlock(cudaSensoryBlock, sensoryCount, intermediateCount, motorCount, netCount);
+        //    var cudaTallyBlock = CUDAWrapper.findTallyBlock(cudaIntermediateBlock, intermediateCount, motorCount, netCount);
+        //    var cudaTempTallyBlock = CUDAWrapper.findTempTallyBlock(cudaTallyBlock, intermediateCount, motorCount, netCount);
+        //    CUDAWrapper.runCycle(sensoryCount, intermediateCount, motorCount, netCount, cudaSensoryBlock, cudaIntermediateBlock, cudaTallyBlock, cudaTempTallyBlock, 0);
+        //    //runCycle(sensoryCount, intermediateCount, motorCount, netCount, cudaSensoryBlock, cudaIntermediateBlock, cudaTallyBlock, cudaTempTallyBlock, 0);
+        //    var returnedTally = CUDAWrapper.getNet(cudaTallyBlock, tallyBlock.Length);
+        //    var tallyResults = new int[tallyBlock.Length];
+        //    var returnedTempTally = CUDAWrapper.getNet(cudaTempTallyBlock, tempTallyBlock.Length);
+        //    var tempTallyResults = new int[tempTallyBlock.Length];
+        //    var returnedNet = CUDAWrapper.getNet(cudaSensoryBlock, encodedNet.Length);
+        //    var netResults = new int[encodedNet.Length];
+        //    Marshal.Copy(returnedTally, tallyResults, 0, tallyBlock.Length);
+        //    Marshal.Copy(returnedTempTally, tempTallyResults, 0, tempTallyBlock.Length);
+        //    Marshal.Copy(returnedNet, netResults, 0, encodedNet.Length);
+        //    CUDAWrapper.release(returnedTally);
+        //    CUDAWrapper.release(returnedNet);
+        //    CUDAWrapper.release(netTransferBlock);
+        //    CUDAWrapper.release(returnedTempTally);
+        //    CUDAWrapper.cuda_release(cudaSensoryBlock);
+        //}
 
         public void SetNetName(String name)
         {

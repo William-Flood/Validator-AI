@@ -32,7 +32,18 @@ namespace Logic
                                                             // to a neuron will be exitatory.
         double oddsOfExitation;
         const int NEURON_THRESHHOLD = Neuron.DEFAULT_THRESHHOLD;
-        Random rng;
+        public static int RngSeed { get; private set; }
+        static Random _rng;
+        Random rng { get {
+                if(null == _rng)
+                {
+                    //_rng = new Random();
+                    RngSeed = (new Random()).Next();
+                    _rng = new Random(RngSeed);
+                    //_rng = new Random(425682);
+                }
+                return _rng;
+            } }
 
 
         public Mutator(
@@ -47,7 +58,7 @@ namespace Logic
             this.oddsOfNewSynapses = oddsOfNewSynapses;
             this.oddsOfPruningSynapses = oddsOfPruningSynapses;
             this.oddsOfExitation = oddsOfExitation;
-            rng = new Random();
+            //rng = new Random();
         }
 
                                                             // Mutates a neural net.
@@ -113,6 +124,7 @@ namespace Logic
         void MutateSynapses(INode mightMutate, INode[] canConnectTo)
         {
             var nodeSynapseList = mightMutate.TempSynapseList;
+            nodeSynapseList.ResetPointer();
             while (nodeSynapseList.ElementsRemain)
             {
                 if (rng.NextDouble() < oddsOfPruningSynapses / nodeSynapseList.Length)

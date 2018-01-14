@@ -120,9 +120,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="bin\Xceed.Wpf.Toolkit.dll" />
-    <Content Include="CUDANetRunner.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="DllImportTest.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

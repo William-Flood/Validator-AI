@@ -34,7 +34,7 @@ namespace Logic
         public static extern IntPtr findTempTallyBlock(IntPtr tallyBlock, int intermediateCount, int motorCount, int netCount);
 
         [DllImport("CUDANetRunner.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void runCycle(int sensoryCount, int intermediateCount, int motorCount, int netCount, IntPtr sensoryBlock, IntPtr intermediateBlock, IntPtr tallyBlock, IntPtr tempTally, int sensoryIndex);
+        public static extern void runCycle(int sensoryCount, int intermediateCount, int motorCount, int netCount, IntPtr sensoryBlock, IntPtr intermediateBlock, IntPtr tallyBlock, IntPtr tempTally, IntPtr sensoryInput, int sensoryInputLength);
 
         [DllImport("CUDANetRunner.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr getTally(IntPtr tallyBlock, int tallyingNeuronCount);
@@ -44,5 +44,8 @@ namespace Logic
 
         [DllImport("CUDANetRunner.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int CalculateBlockCount(int firingNeuronCount);
+
+        [DllImport("CUDANetRunner.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr establish_sensory_input(IntPtr toEstablish, int totalSize);
     }
 }

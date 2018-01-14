@@ -14,6 +14,7 @@ namespace Logic
     {
         public Neuron.actionType[] NeuronActions { get; set; }
         public string TrainingDocumentName { get; set; }
+        public int StartingIntermediates { get; set; }
         // Creates a new neural net.
         public Collective CreateNet()
         {
@@ -33,7 +34,7 @@ namespace Logic
                 throw;
             }
             firstNet.TempIntermediates = new LinkedList<INode>();
-            for (int i = 0; i < 25; i++)
+            for (int i = 0; i < StartingIntermediates; i++)
             {
                 firstNet.TempIntermediates.AddAtStart(new Neuron());
             }
