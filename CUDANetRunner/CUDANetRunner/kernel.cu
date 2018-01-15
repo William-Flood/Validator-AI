@@ -303,6 +303,13 @@ __global__ void finalizeTally(int* tallyBlock, int* tempTally, int intermediateC
 
 }
 
+__global__ void clearTally(int* tallyBlock, int connectedCount) {
+	int tallyID = threadIdx.x + blockIdx.x * BLOCKSIZE;
+	tallyID = tallyID * (tallyID < connectedCount);
+	tallyID = tallyID + blockIdx.x * connectedCount;
+	tallyBlock[tallyID] = 0;
+}
+
 bool isPow2(unsigned int x)
 {
 	return ((x&(x - 1)) == 0);
@@ -446,6 +453,15 @@ __global__ void cudaRunCycle(int sensoryCount, int intermediateCount, int motorC
 	}
 }
 
+__global__ void evaluateNetwork(int* tallyBlock, int* resultBlock, int result, int intermediateCount) {
+	int firstMotorIndex = intermediateCount * (1 + blockIdx.x);
+	int votesTrue = tallyBlock[firstMotorIndex];
+	int votesFalse = tallyBlock[firstMotorIndex + 1];
+	int votedTrue = votesTrue > votesFalse;
+	int votedCorrectly = votedTrue * result + (0 == votedTrue) * (0 == result);
+	resultBlock[blockIdx.x] = votedCorrectly;
+}
+
 
 extern "C"
 {
@@ -553,8 +569,10 @@ extern "C"
 		const char * errorString;
 		cudaError_t err = cudaGetLastError();
 
-		if (cudaSuccess != err)
-		{
+		if (cudaSuccess == err) {
+			cudaDeviceSynchronize();
+		}
+		else {
 			errorString = cudaGetErrorString(err);
 		}
 		/*int firingNeuronCount = intermediateCount+1;
@@ -588,5 +606,15 @@ extern "C"
 
 		cudaMemcpy(net_block, toEstablish, memSize, cudaMemcpyHostToDevice);
 		return net_block;
+	}
+
+	__declspec(dllexport) void clearTally(int * tallyBlock, int netCount, int connectedCount) {
+
+		unsigned int blockSize = BLOCKSIZE;
+		blockSize = connectedCount * (connectedCount <= blockSize) + blockSize * (connectedCount > blockSize);
+		unsigned int firingBlocks = connectedCount / blockSize + (0 != connectedCount % blockSize);
+		dim3 dimBlock(blockSize, 1, 1);
+		dim3 dimGrid(firingBlocks, netCount, 1);
+		clearTally << < dimGrid, dimBlock >> >(tallyBlock, connectedCount);
 	}
 }

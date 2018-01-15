@@ -47,5 +47,8 @@ namespace Logic
 
         [DllImport("CUDANetRunner.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr establish_sensory_input(IntPtr toEstablish, int totalSize);
+
+        [DllImport("CUDANetRunner.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void clearTally(IntPtr tallyBlock, int netCount, int connectedCount);
     }
 }

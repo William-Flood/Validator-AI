@@ -13,7 +13,7 @@ namespace Logic
                                                             // file or a scrambled version
     class TestAgainst
     {
-        LinkedList<char> testArray;
+        public LinkedList<char> TestArray { get; set; }
 
                                                             // Indicates if the string has been scrambled
         bool _isReal;
@@ -29,7 +29,7 @@ namespace Logic
         public TestAgainst(String testString)
         {
             Random rng = new Random();
-            this.testArray = new LinkedList<char>();
+            this.TestArray = new LinkedList<char>();
             bool swapLetter;
             bool addLetter;
             if(0 == rng.Next(2))
@@ -50,30 +50,30 @@ namespace Logic
                     }
                     if(swapLetter)
                     {
-                        placement = rng.Next(testArray.Length);
-                        if (placement > testArray.CurrentIndex)
+                        placement = rng.Next(TestArray.Length);
+                        if (placement > TestArray.CurrentIndex)
                         {
-                            testArray.ResetPointer();
+                            TestArray.ResetPointer();
                         }
                         else
                         {
-                            placement -= testArray.CurrentIndex;
+                            placement -= TestArray.CurrentIndex;
                         }
                         for (int i = 0; i < placement; i++)
                         {
-                            testArray.MoveUp();
+                            TestArray.MoveUp();
                         }
                         if(Char.IsLetter(character))
                         {
-                            testArray.AddAfter(Char.ToLower(character));
+                            TestArray.AddAfter(Char.ToLower(character));
                         }
                         else
                         {
-                            testArray.AddAfter(character);
+                            TestArray.AddAfter(character);
                         }
                     }
                 }
-                testArray.ResetPointer();
+                TestArray.ResetPointer();
                 foreach(char character in testString)
                 {
                     switch (character)
@@ -89,9 +89,9 @@ namespace Logic
                     }
                     if(addLetter)
                     {
-                        testArray.AddAfter(character);
+                        TestArray.AddAfter(character);
                     }
-                    testArray.MoveUp();
+                    TestArray.MoveUp();
                 }
                 _isReal = false;
             }
@@ -101,50 +101,50 @@ namespace Logic
                 {
                     if (Char.IsLetter(character))
                     {
-                        testArray.AddAfter(Char.ToLower(character));
+                        TestArray.AddAfter(Char.ToLower(character));
                     }
                     else
                     {
-                        testArray.AddAfter(character);
+                        TestArray.AddAfter(character);
                     }
-                    testArray.MoveUp();
+                    TestArray.MoveUp();
                 }
                 _isReal = true;
             }
-            testArray.ResetPointer();
+            TestArray.ResetPointer();
         }
 
                                                             // Produces a copy of an instance
         public TestAgainst(TestAgainst toCopy)
         {
-            this.testArray = new LinkedList<char>(toCopy.testArray);
+            this.TestArray = new LinkedList<char>(toCopy.TestArray);
             this._isReal = toCopy._isReal;
         }
 
                                                             // Returns the next character in testArray
         public char getNext()
         {
-            testArray.MoveUp();
-            return testArray.Value;
+            TestArray.MoveUp();
+            return TestArray.Value;
         }
 
                                                             // Returns the current character in testArray
         public char value()
         {
-            return testArray.Value;
+            return TestArray.Value;
         }
 
                                                             // Indicates if there are any more characters
                                                             // which could be sent.
         public bool charsRemain()
         {
-            return testArray.ElementsRemain;
+            return TestArray.ElementsRemain;
         }
 
                                                             // Resets testArray.
         public void resetPointer()
         {
-            testArray.ResetPointer();
+            TestArray.ResetPointer();
         }
     }
 }

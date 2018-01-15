@@ -601,5 +601,46 @@ namespace DataStructures
                 toOptimize.compare){
         }
 
+        public int IndexOf(Key toSearchfor)
+        {
+            var result = 0;
+
+            bool latch = true;
+            TreeElement<Key, Value> scanning = firstElement;
+            while (latch)
+            {
+                if (0 == compare(scanning.key, toSearchfor))
+                {
+                    result = result + scanning.onLeft;
+                    foundLast = scanning;
+                    return result;
+                }
+                else if (0 < compare(scanning.key, toSearchfor))
+                {
+                    if (scanning.hasLeft)
+                    {
+                        scanning = scanning.leftBranch;
+                    }
+                    else
+                    {
+                        latch = false;
+                    }
+                }
+                else
+                {
+                    if (scanning.hasRight)
+                    {
+                        result = result + scanning.onLeft;
+                        scanning = scanning.rightBranch;
+                    }
+                    else
+                    {
+                        latch = false;
+                    }
+                }
+            }
+            throw new ArgumentOutOfRangeException("key", "Key not found!");
+        }
+
     }
 }

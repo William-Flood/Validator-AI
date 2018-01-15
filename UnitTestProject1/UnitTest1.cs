@@ -21,7 +21,7 @@ namespace UnitTestProject1
                 TrainingDocumentName = "test.txt",
                 StartingIntermediates = 50
             };
-            var netsToTest = new NetStructure[50];
+            var netsToTest = new NetStructure[80];
             Mutator generatorMutator = new Mutator(0, 0, .9, .01, .8);
             int maxIntermediateLength = 0;
             for (int i = 0; i < netsToTest.Length; i++)
@@ -54,8 +54,7 @@ namespace UnitTestProject1
             }
             var sensoryCount = netsToTest[0].SensoryList.Length;
             var motorCount = 2;
-            //var blockCount = CUDAWrapper.CalculateBlockCount(motorCount + maxIntermediateLength);
-            var blockCount = 4;
+            var blockCount = CUDAWrapper.CalculateBlockCount(motorCount + maxIntermediateLength);
             var connectedCount = maxIntermediateLength + motorCount;
             var sensoryGridCount = sensoryCount * (connectedCount) * netsToTest.Length;
             var intermediateGridCount = maxIntermediateLength * (connectedCount) * netsToTest.Length;
@@ -140,11 +139,11 @@ namespace UnitTestProject1
             var cudaTempTallyBlock = CUDAWrapper.findTempTallyBlock(cudaTallyBlock, maxIntermediateLength, motorCount, netsToTest.Length);
 
 
-            for (int sensoryInputIndex = 0; sensoryInputIndex < 10000; sensoryInputIndex++)
+            for (int sensoryInputIndex = 0; sensoryInputIndex < 1; sensoryInputIndex++)
             {
 
                 //Net index: 5, Neuron index: 0
-                var sensoryInput = new int[1];
+                var sensoryInput = new int[100];
                 for(int i = 0; i< sensoryInput.Length; i++)
                 {
                     sensoryInput[i] = rng.Next(sensoryCount);
@@ -175,6 +174,7 @@ namespace UnitTestProject1
                 CUDAWrapper.release(returnedTally);
                 CUDAWrapper.release(returnedNet);
                 CUDAWrapper.release(returnedTempTally);
+                CUDAWrapper.release(sensoryTransferBlock);
                 //CUDAWrapper.cuda_release(cudaSensoryBlock);
                 CUDAWrapper.cuda_release(sensoryAddress);
 

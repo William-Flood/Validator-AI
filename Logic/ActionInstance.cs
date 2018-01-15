@@ -46,7 +46,6 @@ namespace Logic
         {
             runLatch = false;
             trainingList = new EvaluatedNetwork[10];
-            Random rng = new Random();
             //const double SELECTPROB = 0.8;
             //Breeder breeder = new Breeder();
             var cloningVat = new FlowerPot() { NeuronActions = new Neuron.actionType[] { this.SendFalse, this.SendTrue }};

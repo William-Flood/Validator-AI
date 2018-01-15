@@ -41,14 +41,14 @@ namespace Logic
             {
                 return true;
             }
-            else if (
-                (this.TimesCorrect == numberOfSentences) &&
-                (this.TotalCyclesTaken <
-                contender.TotalCyclesTaken)
-                )
-            {
-                return true;
-            }
+            //else if (
+            //    (this.TimesCorrect == numberOfSentences) &&
+            //    (this.TotalCyclesTaken <
+            //    contender.TotalCyclesTaken)
+            //    )
+            //{
+            //    return true;
+            //}
             return false;
         }
 
