@@ -277,7 +277,7 @@ namespace Logic
             int totalTimesCorrect = 0;
             continueTraining = true;
             LinkedList<EvaluatedNetwork> trainingList;
-            const int NUMBER_TO_CLONE = 8;
+            const int NUMBER_OF_CLONES = 8;
             GetTrainingString trainerProvider = new GetTrainingString(AppData.TrainingDocumentsPath +
                 trainingDocumentName);
             int i = 0;
@@ -285,7 +285,8 @@ namespace Logic
             var cloneVat = new FlowerPot() { NeuronActions = new Neuron.actionType[] { this.SendFalse, this.SendTrue }, TrainingDocumentName = this.trainingDocumentName };
             for (int j = 0; j < 10; j++)
             {
-                judgedNets[j]=new EvaluatedNetwork() {
+                judgedNets[j] = new EvaluatedNetwork()
+                {
                     Trainee = cloneVat.CloneNet(loadedNet, j)
                 };
                 trainingMutator.MutateNetwork(judgedNets[j].Trainee.Components[0]);
@@ -317,88 +318,29 @@ namespace Logic
                 totalTimesRan = 0;
                 totalTimesCorrect = 0;
                 int numberOfSentences = 0;
-                const int PARAGRAPHS_BETWEEN_JUDEGEMENT = 5;
+                const int PARAGRAPHS_BETWEEN_JUDEGEMENT = 10;
                 while (false == testString.Equals("END OF FILE") && continueTraining)
                 {
-                    trainingList = new LinkedList<EvaluatedNetwork>();
                     numberOfSentences = 0;
-                    var maxIntermediateLength = 0;
-                    for (int j = 0; j < NUMBER_TO_CLONE; j++)
+                    trainingInstances = new LinkedList<ActionInstance>();
+                    for (int j = 0; j < NUMBER_OF_CLONES; j++)
                     {
-                        //const double SELECTPROB = 0.8;
-                        //Breeder breeder = new Breeder();
-                        var cloningVat = new FlowerPot() { NeuronActions = new Neuron.actionType[] { this.SendFalse, this.SendTrue } };
-                        for (int k = 0; k < 10; k++)
-                        {
-                            
-                            var newNetwork =
-                                new EvaluatedNetwork { Trainee = cloningVat.CloneNet(judgedNets[k].Trainee, j) };
-                            trainingMutator.MutateNetwork(newNetwork.Trainee.Components[0]);
-                            FlowerPot.HardenNet(newNetwork.Trainee);
-                            var newIntermediateLength = newNetwork.Trainee.Components[0].Intermediates.Length;
-                            trainingList.AddAtStart(newNetwork);
-                            if(maxIntermediateLength < newIntermediateLength)
-                            {
-                                maxIntermediateLength = newIntermediateLength;
-                            }
-                        }
+                        trainingInstances.AddAtStart(
+                            new ActionInstance(judgedNets, trainingMutator, j)
+                            );
                     }
                     judgedNets.ResetPointer();
                     judgedNets.MoveUp();
-                    while(judgedNets.ElementsRemain)
+                    while (judgedNets.ElementsRemain)
                     {
                         judgedNets.Value.Dealloc();
                         judgedNets.Remove();
                     }
-                    var sensoryCount = trainingList[0].Trainee.Components[0].SensoryList.Length;
-                    var motorCount = 2;
-                    var blockCount = CUDAWrapper.CalculateBlockCount(motorCount + maxIntermediateLength);
-                    var connectedCount = maxIntermediateLength + motorCount;
-                    var sensoryGridCount = sensoryCount * (connectedCount) * trainingList.Length;
-                    var intermediateGridCount = maxIntermediateLength * (connectedCount) * trainingList.Length;
-                    var tallyGridCount = (maxIntermediateLength + motorCount) * trainingList.Length;
-                    var flatNetGrid = new int[sensoryGridCount + intermediateGridCount + tallyGridCount + tallyGridCount * blockCount];
-
-                    var SensoryBrick = new int[connectedCount, sensoryCount, trainingList.Length];
-                    var IntermediateBrick = new int[connectedCount, maxIntermediateLength, trainingList.Length];
-                    var tempTallyGrid = new int[connectedCount, trainingList.Length];
-                    var tallyGrid = new int[connectedCount, trainingList.Length];
-                    for (var netIterator = 0; netIterator < trainingList.Length; netIterator++)
-                    {
-                        var sensoryList = trainingList[netIterator].Trainee.Components[0].SensoryGrid;
-                        for (var targetIterator = 0; targetIterator < sensoryList.GetLength(0); targetIterator++)
-                        {
-                            for (var firingIterator = 0; firingIterator < sensoryList.GetLength(1); firingIterator++)
-                            {
-                                flatNetGrid[targetIterator + firingIterator * connectedCount + netIterator * sensoryCount * connectedCount] = sensoryList[targetIterator, firingIterator];
-                            }
-                        }
-                    }
-
-                    var flatIntermedidateStart = trainingList.Length * sensoryCount * connectedCount;
-                    for (var netIterator = 0; netIterator < trainingList.Length; netIterator++)
-                    {
-                        var intermediateList = trainingList[netIterator].Trainee.Components[0].IntermediateGrid;
-                        
-                        for (var targetIterator = 0; targetIterator < intermediateList.GetLength(0); targetIterator++)
-                        {
-                            for (var firingIterator = 0; firingIterator < intermediateList.GetLength(1); firingIterator++)
-                            {
-                                flatNetGrid[flatIntermedidateStart + targetIterator + firingIterator * connectedCount + netIterator * maxIntermediateLength * connectedCount] = intermediateList[targetIterator, firingIterator];
-                            }
-                        }
-                    }
-                    IntPtr netTransferBlock = CUDAWrapper.declare_transfer_block(flatNetGrid.Length);
-                    Marshal.Copy(flatNetGrid, 0, netTransferBlock, flatNetGrid.Length);
-                    IntPtr cudaSensoryBlock = CUDAWrapper.establish_net_block(netTransferBlock, flatNetGrid.Length);
-                    IntPtr cudaIntermediateBlock = CUDAWrapper.findIntermediateBlock(cudaSensoryBlock, sensoryCount, maxIntermediateLength, motorCount, trainingList.Length);
-                    var cudaTallyBlock = CUDAWrapper.findTallyBlock(cudaIntermediateBlock, maxIntermediateLength, motorCount, trainingList.Length);
-                    var cudaTempTallyBlock = CUDAWrapper.findTempTallyBlock(cudaTallyBlock, maxIntermediateLength, motorCount, trainingList.Length);
-
                     for (int paragraph = 0;
                         paragraph < PARAGRAPHS_BETWEEN_JUDEGEMENT;
                         paragraph++)
                     {
+                        var test = "test";
                         while ((false == testString.Equals("END OF PARAGRAPH")) &&
                             (false == testString.Equals("END OF FILE")) &&
                             continueTraining)
@@ -406,65 +348,30 @@ namespace Logic
                             numberOfSentences++;
                             totalSentences++;
                             TestAgainst testAccomplice = new TestAgainst(testString);
-                            var testData = new int[testAccomplice.TestArray.Length];
-                            var testIndex = 0;
-                            foreach (var character in testAccomplice.TestArray)
+                            trainingThreads = new LinkedList<Thread>();
+                            foreach (ActionInstance trainingInstance in trainingInstances)
                             {
-                                testData[testIndex] = trainingList[0].Trainee.SensoryMap.IndexOf(character);
-                                testIndex++;
+                                trainingInstance.getTestAccomplice(testAccomplice);
+                                //trainingInstance.runTrainingCycle();
+
+                                trainingThreads.AddAtStart(new Thread(
+                                    new ThreadStart(trainingInstance.runTrainingCycle)));
+                                trainingThreads[0].Start();
                             }
-                            IntPtr sensoryTransferBlock = CUDAWrapper.declare_transfer_block(testData.Length);
-                            Marshal.Copy(testData, 0, sensoryTransferBlock, testData.Length);
-                            var sensoryAddress = CUDAWrapper.establish_sensory_input(sensoryTransferBlock, testData.Length);
-                            CUDAWrapper.runCycle(sensoryCount, maxIntermediateLength, motorCount, trainingList.Length, cudaSensoryBlock, cudaIntermediateBlock, cudaTallyBlock, cudaTempTallyBlock, sensoryAddress, testData.Length);
-                            var returnedTally = CUDAWrapper.getNet(cudaTallyBlock, connectedCount * trainingList.Length);
-                            var tallyResults = new int[connectedCount * trainingList.Length];
-                            Marshal.Copy(returnedTally, tallyResults, 0, connectedCount * trainingList.Length);
-                            CUDAWrapper.release(returnedTally);
-                            CUDAWrapper.cuda_release(sensoryTransferBlock);
-                            CUDAWrapper.release(sensoryTransferBlock);
-                            var motorIndex = maxIntermediateLength;
-                            foreach(var trainingInstance in trainingList)
+                            bool cycleLatch = true;
+                            while (cycleLatch)
                             {
-                                var trueCount = tallyResults[motorIndex];
-                                var falseCount = tallyResults[motorIndex + 1];
-                                var guessedTrue = trueCount >= falseCount;
-                                var guessedCorrectly = guessedTrue;
-                                if (!testAccomplice.isReal)
+                                Thread.Sleep(5);
+                                cycleLatch = false;
+                                foreach (ActionInstance trainingInstance in trainingInstances)
                                 {
-                                    guessedCorrectly = !guessedCorrectly;
+                                    cycleLatch = cycleLatch || false == trainingInstance.TrainingDone();
                                 }
-                                if(guessedCorrectly)
-                                {
-                                    trainingInstance.TimesCorrect += 1;
-                                }
-                                motorIndex += connectedCount;
                             }
-                            CUDAWrapper.clearTally(cudaTallyBlock, trainingList.Length, connectedCount);
-                            //trainingThreads = new LinkedList<Thread>();
-                            //foreach (ActionInstance trainingInstance in trainingInstances)
-                            //{
-                            //    trainingInstance.getTestAccomplice(testAccomplice);
-                            //    //trainingInstance.runTrainingCycle();
-                            //    
-                            //    trainingThreads.AddAtStart(new Thread(
-                            //        new ThreadStart(trainingInstance.runTrainingCycle)));
-                            //    trainingThreads[0].Start();
-                            //}
-                            //bool cycleLatch = true;
-                            //while (cycleLatch)
-                            //{
-                            //    Thread.Sleep(5);
-                            //    cycleLatch = false;
-                            //    foreach (ActionInstance trainingInstance in trainingInstances)
-                            //    {
-                            //        cycleLatch = cycleLatch || false == trainingInstance.TrainingDone();
-                            //    }
-                            //}
-                            //foreach (Thread trainingThread in trainingThreads)
-                            //{
-                            //    trainingThread.Abort();
-                            //}
+                            foreach (Thread trainingThread in trainingThreads)
+                            {
+                                trainingThread.Abort();
+                            }
 
                             testString = trainerProvider.getSentence();
                         }
@@ -472,6 +379,11 @@ namespace Logic
                         {
                             testString = trainerProvider.getSentence();
                         }
+                    }
+                    trainingList = new LinkedList<EvaluatedNetwork>();
+                    foreach (ActionInstance trainingInstance in trainingInstances)
+                    {
+                        trainingInstance.AddNets(trainingList);
                     }
                     judgedNets = new LinkedList<EvaluatedNetwork>();
                     LinkedList<EvaluatedNetwork> alreadyJudged = new LinkedList<EvaluatedNetwork>(judgedNets);
@@ -496,7 +408,13 @@ namespace Logic
                         }
                     }
                     judgedNets.ResetPointer();
-                    //totalTimesRan += judgedNets[0].TimesGuessed;
+                    int[] judgedCurrectGuesses = new int[judgedNets.Length];
+                    while (judgedNets.ElementsRemain)
+                    {
+                        judgedNets.MoveUp();
+                        judgedCurrectGuesses[judgedNets.CurrentIndex] = judgedNets.Value.TimesCorrect;
+                    }
+                    totalTimesRan += judgedNets[0].TimesGuessed;
                     totalTimesCorrect += judgedNets[0].TimesCorrect;
                     loadedNet = judgedNets[0].Trainee;
                     const double GUESSTOLERANCE = .9;
@@ -523,8 +441,9 @@ namespace Logic
                     //    }
                     //
                     //}
-                    else */if (judgedNets[0].TimesGuessed < 
-                        GUESSTOLERANCE * numberOfSentences)
+                    else */
+                    if (judgedNets[0].TimesGuessed <
+                 GUESSTOLERANCE * numberOfSentences)
                     {
                         // The parameters indicate the
                         // value the given odd should approach.
@@ -535,7 +454,7 @@ namespace Logic
                         trainingMutator.adjustExitationOdds(.9);
                     }
                     else if (judgedNets[0].TimesCorrect ==
-                        judgedNets[(int)(judgedNets.Length * SEARCHBACK)].TimesCorrect*SEARCHBACK_IMPROVEMENT_THRESHHOLD)
+                        judgedNets[(int)(judgedNets.Length * SEARCHBACK)].TimesCorrect * SEARCHBACK_IMPROVEMENT_THRESHHOLD)
                     {
                         trainingMutator.adjustNeurogenesisOdds(.01);
                         trainingMutator.adjustLysingOdds(.1);
@@ -567,8 +486,6 @@ namespace Logic
                     }
                     numberOfSentences = 0;
 
-                    CUDAWrapper.release(netTransferBlock);
-                    CUDAWrapper.cuda_release(cudaSensoryBlock);
                 }
                 if (totalSentences > 0)
                 {
