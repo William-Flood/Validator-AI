@@ -277,7 +277,8 @@ namespace Logic
             int totalTimesCorrect = 0;
             continueTraining = true;
             LinkedList<EvaluatedNetwork> trainingList;
-            const int NUMBER_OF_CLONES = 8;
+            const int NUMBER_OF_CLONES = 5;
+            const int NUMBER_TO_CLONE = 10;
             GetTrainingString trainerProvider = new GetTrainingString(AppData.TrainingDocumentsPath +
                 trainingDocumentName);
             int i = 0;
@@ -294,8 +295,11 @@ namespace Logic
             }
             LinkedList<ActionInstance> trainingInstances;
             LinkedList<Thread> trainingThreads;
+
+            var cloningVat = new FlowerPot() { NeuronActions = new Neuron.actionType[] { this.SendFalse, this.SendTrue } };
             while (continueTraining && i < trainingCycles)
             {
+                var guessHistory = new System.Collections.Generic.List<float>();
                 i++;
                 String testString;
                 try
@@ -323,11 +327,75 @@ namespace Logic
                 {
                     numberOfSentences = 0;
                     trainingInstances = new LinkedList<ActionInstance>();
+                    trainingList = new LinkedList<EvaluatedNetwork>();
+                    var maxIntermediateLength = 0;
                     for (int j = 0; j < NUMBER_OF_CLONES; j++)
                     {
-                        trainingInstances.AddAtStart(
-                            new ActionInstance(judgedNets, trainingMutator, j)
-                            );
+                        for (int k = 0; k < 10; k++)
+                        {
+                            var newNetwork =
+                                new EvaluatedNetwork { Trainee = cloningVat.CloneNet(judgedNets[k].Trainee, j) };
+                            trainingMutator.MutateNetwork(newNetwork.Trainee.Components[0]);
+                            FlowerPot.HardenNet(newNetwork.Trainee);
+
+                            if (newNetwork.Trainee.Components[0].Intermediates.Length > maxIntermediateLength)
+                            {
+                                maxIntermediateLength = newNetwork.Trainee.Components[0].Intermediates.Length;
+                            }
+                            trainingList.AddAtStart(newNetwork);
+                        }
+                    }
+
+                    var sensoryCount = trainingList[0].Trainee.SensoryMap.getSize();
+                    var motorCount = 2;
+                    int connectedCount = maxIntermediateLength + motorCount;
+                    int[,,] SensoryBrick = new int[connectedCount, sensoryCount, trainingList.Length];
+                    int[,,] IntermediateBrick = new int[connectedCount, maxIntermediateLength, trainingList.Length];
+                    int[,] tallyGrid = tallyGrid = new int[connectedCount, trainingList.Length];
+                    connectedCount = maxIntermediateLength + motorCount;
+
+                    for (var netIterator = 0; netIterator < trainingList.Length; netIterator++)
+                    {
+                        var sensoryList = trainingList[netIterator].Trainee.Components[0].SensoryGrid;
+                        for (var targetIterator = 0; targetIterator < sensoryList.GetLength(0); targetIterator++)
+                        {
+                            for (var firingIterator = 0; firingIterator < sensoryList.GetLength(1); firingIterator++)
+                            {
+                                var intermediateCount = trainingList[netIterator].Trainee.Components[0].Intermediates.Length;
+                                if (targetIterator < intermediateCount)
+                                {
+                                    SensoryBrick[targetIterator, firingIterator, netIterator] = sensoryList[targetIterator, firingIterator];
+                                } else
+                                {
+                                    var motorIndex = targetIterator - intermediateCount;
+                                    SensoryBrick[maxIntermediateLength + motorIndex, firingIterator, netIterator] = sensoryList[targetIterator, firingIterator];
+                                }
+                                
+                            }
+                        }
+                    }
+
+                    var flatIntermedidateStart = trainingList.Length * sensoryCount * connectedCount;
+                    for (var netIterator = 0; netIterator < trainingList.Length; netIterator++)
+                    {
+                        var intermediateList = trainingList[netIterator].Trainee.Components[0].IntermediateGrid;
+
+                        for (var targetIterator = 0; targetIterator < intermediateList.GetLength(0); targetIterator++)
+                        {
+                            for (var firingIterator = 0; firingIterator < intermediateList.GetLength(1); firingIterator++)
+                            {
+                                var intermediateCount = trainingList[netIterator].Trainee.Components[0].Intermediates.Length;
+                                if (targetIterator < intermediateCount)
+                                {
+                                    IntermediateBrick[targetIterator, firingIterator, netIterator] = intermediateList[targetIterator, firingIterator];
+                                } else
+                                {
+                                    var motorIndex = targetIterator - intermediateCount;
+                                    IntermediateBrick[maxIntermediateLength + motorIndex, firingIterator, netIterator] = intermediateList[targetIterator, firingIterator];
+                                }
+                                    
+                            }
+                        }
                     }
                     judgedNets.ResetPointer();
                     judgedNets.MoveUp();
@@ -348,29 +416,69 @@ namespace Logic
                             numberOfSentences++;
                             totalSentences++;
                             TestAgainst testAccomplice = new TestAgainst(testString);
-                            trainingThreads = new LinkedList<Thread>();
-                            foreach (ActionInstance trainingInstance in trainingInstances)
+                            var testData = new int[testAccomplice.TestArray.Length];
+                            var testIndex = 0;
+                            foreach (var character in testAccomplice.TestArray)
                             {
-                                trainingInstance.getTestAccomplice(testAccomplice);
-                                //trainingInstance.runTrainingCycle();
-
-                                trainingThreads.AddAtStart(new Thread(
-                                    new ThreadStart(trainingInstance.runTrainingCycle)));
-                                trainingThreads[0].Start();
+                                testData[testIndex] = trainingList[0].Trainee.SensoryMap.IndexOf(character);
+                                testIndex++;
                             }
-                            bool cycleLatch = true;
-                            while (cycleLatch)
+                            if (0 == testData.Length)
                             {
-                                Thread.Sleep(5);
-                                cycleLatch = false;
-                                foreach (ActionInstance trainingInstance in trainingInstances)
+                                testString = trainerProvider.getSentence();
+                                continue;
+                            }
+                            foreach (var inputValue in testData) //Execution split up to judge execution times.
+                            {
+                                LinearNetRunner.RunNet(SensoryBrick, IntermediateBrick, tallyGrid, inputValue, 20);
+                            }
+                            var motorIndex = maxIntermediateLength;
+                            var netIndex = 0;
+                            var correctGuesses = 0;
+                            var intermediatesToMotors = new int[2, IntermediateBrick.GetLength(1), IntermediateBrick.GetLength(2)];
+                            //for(var intDepth = 0; intDepth < IntermediateBrick.GetLength(1); intDepth++)
+                            //{
+                            //    for (var intBreadth = 0; intBreadth < IntermediateBrick.GetLength(1); intBreadth++)
+                            //    {
+                            //        intermediatesToMotors[0, intDepth, intBreadth] = IntermediateBrick[IntermediateBrick.GetLength(0) - 2, intDepth, intBreadth];
+                            //        intermediatesToMotors[1, intDepth, intBreadth] = IntermediateBrick[IntermediateBrick.GetLength(0) - 1, intDepth, intBreadth];
+                            //    }
+                            //}
+                            var flippedIntermediates = new int[IntermediateBrick.GetLength(2), IntermediateBrick.GetLength(1), IntermediateBrick.GetLength(0)];
+                            for (var intLength = 0; intLength < IntermediateBrick.GetLength(0); intLength++)
+                            {
+                                for (var intDepth = 0; intDepth < IntermediateBrick.GetLength(1); intDepth++)
                                 {
-                                    cycleLatch = cycleLatch || false == trainingInstance.TrainingDone();
+                                    for (var intBreadth = 0; intBreadth < IntermediateBrick.GetLength(2); intBreadth++)
+                                    {
+                                        flippedIntermediates[intBreadth, intDepth, intLength] = IntermediateBrick[intLength, intDepth, intBreadth];
+                                    }
                                 }
                             }
-                            foreach (Thread trainingThread in trainingThreads)
+                            foreach (EvaluatedNetwork candidateNet in trainingList)
                             {
-                                trainingThread.Abort();
+                                var trueCount = tallyGrid[motorIndex, netIndex];
+                                var falseCount = tallyGrid[motorIndex + 1, netIndex];
+                                var guessedTrue = trueCount >= falseCount;
+                                var guessedCorrectly = guessedTrue;
+                                if (!testAccomplice.isReal)
+                                {
+                                    guessedCorrectly = !guessedCorrectly;
+                                }
+                                if (guessedCorrectly)
+                                {
+                                    correctGuesses++;
+                                    candidateNet.TimesCorrect += 1;
+                                }
+                                netIndex++;
+                            }
+                            guessHistory.Add(correctGuesses / trainingList.Length);
+                            for(int tallyCol = 0; tallyCol < tallyGrid.GetLength(0); tallyCol++)
+                            {
+                                for(int tallyRow = 0; tallyRow < tallyGrid.GetLength(1); tallyRow++)
+                                {
+                                    tallyGrid[tallyCol, tallyRow] = 0;
+                                }
                             }
 
                             testString = trainerProvider.getSentence();
@@ -380,7 +488,6 @@ namespace Logic
                             testString = trainerProvider.getSentence();
                         }
                     }
-                    trainingList = new LinkedList<EvaluatedNetwork>();
                     foreach (ActionInstance trainingInstance in trainingInstances)
                     {
                         trainingInstance.AddNets(trainingList);
@@ -442,7 +549,7 @@ namespace Logic
                     //
                     //}
                     else */
-                    if (judgedNets[0].TimesGuessed <
+                    /*if (judgedNets[0].TimesGuessed <
                  GUESSTOLERANCE * numberOfSentences)
                     {
                         // The parameters indicate the
@@ -462,13 +569,13 @@ namespace Logic
                         trainingMutator.adjustPruneSynapseOdds(.5);
                         trainingMutator.adjustExitationOdds(.2);
                     }
-                    else if (judgedNets[0].TimesCorrect < numberOfSentences)
+                    else*/ if (judgedNets[0].TimesCorrect < numberOfSentences)
                     {
                         trainingMutator.adjustNeurogenesisOdds(.05);
                         trainingMutator.adjustLysingOdds(.01);
-                        trainingMutator.adjustNewSynapsesOdds(.05);
-                        trainingMutator.adjustPruneSynapseOdds(.05);
-                        trainingMutator.adjustExitationOdds(.2);
+                        trainingMutator.adjustNewSynapsesOdds(.2);
+                        trainingMutator.adjustPruneSynapseOdds(.1);
+                        trainingMutator.adjustExitationOdds(.5);
                     }
                     else
                     {

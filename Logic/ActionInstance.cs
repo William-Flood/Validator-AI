@@ -32,6 +32,11 @@ namespace Logic
         // A list of neural nets to be
         // tested.
         EvaluatedNetwork[] trainingList;
+        int[,,] SensoryBrick;
+        int[,,] IntermediateBrick;
+        int[,] tallyGrid;
+        int connectedCount;
+        int maxIntermediateLength;
 
         // Sets the testAccomplice
         public void getTestAccomplice(TestAgainst toCopy)
@@ -48,6 +53,7 @@ namespace Logic
             trainingList = new EvaluatedNetwork[10];
             //const double SELECTPROB = 0.8;
             //Breeder breeder = new Breeder();
+            maxIntermediateLength = 0;
             var cloningVat = new FlowerPot() { NeuronActions = new Neuron.actionType[] { this.SendFalse, this.SendTrue }};
             for (int k = 0; k < 10; k++)
             {          
@@ -55,35 +61,42 @@ namespace Logic
                     new EvaluatedNetwork { Trainee = cloningVat.CloneNet(toClone[k].Trainee, j) };
                 trainingMutator.MutateNetwork(trainingList[k].Trainee.Components[0]);
                 FlowerPot.HardenNet(trainingList[k].Trainee);
-                
-                //bool motherNeeded = true;
-                //Collective mother = null;
-                //bool fatherNeeded = true;
-                //Collective father = null;
-                //int mateIndex = 0;
-                //while (fatherNeeded)
-                //{
-                //    if(rng.NextDouble() < SELECTPROB)
-                //    {
-                //        if (motherNeeded)
-                //        {
-                //            motherNeeded = false;
-                //            mother = toClone[mateIndex];
-                //        }
-                //        else
-                //        {
-                //            fatherNeeded = false;
-                //            father = toClone[mateIndex];
-                //        }
-                //    }
-                //    mateIndex = (mateIndex + 1) % toClone.Length;
-                //}
-                //breeder.sequenceNets(father, mother);
-                //trainingList.AddAtStart(new EvaluatedNetwork {Trainee=breeder.breed()});
-                //trainingMutator.mutate(trainingList[0].Trainee);
-                //trainingList[0].Trainee.MotorList[0].SetAction(sendFalse);
-                //trainingList[0].Trainee.MotorList[1].SetAction(sendTrue);
-                //k++;
+
+                if (trainingList[k].Trainee.Components[0].Intermediates.Length > maxIntermediateLength)
+                {
+                    maxIntermediateLength = trainingList[k].Trainee.Components[0].Intermediates.Length;
+                }
+            }
+            var sensoryCount = trainingList[0].Trainee.SensoryMap.getSize();
+            var motorCount = 2;
+            connectedCount = maxIntermediateLength + motorCount;
+            SensoryBrick = new int[connectedCount, sensoryCount, trainingList.Length];
+            IntermediateBrick = new int[connectedCount, maxIntermediateLength, trainingList.Length];
+            tallyGrid = new int[connectedCount, trainingList.Length];
+            for (var netIterator = 0; netIterator < trainingList.Length; netIterator++)
+            {
+                var sensoryList = trainingList[netIterator].Trainee.Components[0].SensoryGrid;
+                for (var targetIterator = 0; targetIterator < sensoryList.GetLength(0); targetIterator++)
+                {
+                    for (var firingIterator = 0; firingIterator < sensoryList.GetLength(1); firingIterator++)
+                    {
+                        SensoryBrick[targetIterator, firingIterator, netIterator] = sensoryList[targetIterator, firingIterator];
+                    }
+                }
+            }
+
+            var flatIntermedidateStart = trainingList.Length * sensoryCount * connectedCount;
+            for (var netIterator = 0; netIterator < trainingList.Length; netIterator++)
+            {
+                var intermediateList = trainingList[netIterator].Trainee.Components[0].IntermediateGrid;
+
+                for (var targetIterator = 0; targetIterator < intermediateList.GetLength(0); targetIterator++)
+                {
+                    for (var firingIterator = 0; firingIterator < intermediateList.GetLength(1); firingIterator++)
+                    {
+                        IntermediateBrick[targetIterator, firingIterator, netIterator] = intermediateList[targetIterator, firingIterator];
+                    }
+                }
             }
         }
 
@@ -165,73 +178,39 @@ namespace Logic
         public void runTrainingCycle()
         {
             runLatch = false;
+
+            var testData = new int[testAccomplice.TestArray.Length];
+            var testIndex = 0;
+            foreach (var character in testAccomplice.TestArray)
+            {
+                testData[testIndex] = trainingList[0].Trainee.SensoryMap.IndexOf(character);
+                testIndex++;
+            }
+            foreach (var inputValue in testData) //Execution split up to judge execution times.
+            {
+                LinearNetRunner.RunNet(SensoryBrick, IntermediateBrick, tallyGrid, inputValue, 20);
+            }
+            var motorIndex = maxIntermediateLength;
+            var netIndex = 0;
             foreach (EvaluatedNetwork candidateNet in trainingList)
             {
-                continueTest = true;
-                int trialsTaken = LogicCycle(candidateNet.Trainee);
-                if (false == continueTest)
+                var trueCount = tallyGrid[motorIndex, netIndex];
+                var falseCount = tallyGrid[motorIndex + 1, netIndex];
+                var guessedTrue = trueCount >= falseCount;
+                var guessedCorrectly = guessedTrue;
+                if (!testAccomplice.isReal)
                 {
-                    candidateNet.TimesGuessed++;
-                    if (guessedCorrectly)
-                    {
-                        candidateNet.TimesCorrect++;
-                    }
-                    candidateNet.TotalCyclesTaken += trialsTaken;
+                    guessedCorrectly = !guessedCorrectly;
                 }
-                candidateNet.Trainee.Reset();
+                if (guessedCorrectly)
+                {
+                    candidateNet.TimesCorrect += 1;
+                }
+                netIndex++;
             }
             runLatch = true;
         }
-
-        //Performs the logic of the neural net.  
-        //Returns the number of cycles taken
-        int LogicCycle(Collective activeNet)
-        {
-            testAccomplice.resetPointer();
-            const int OUTER_ITERATIONS_ALLOWED = 100;
-            const int INNER_ITERATIONS_USED = 10;
-            int outerIterations = 0;
-            while (outerIterations < OUTER_ITERATIONS_ALLOWED && continueTest)
-            {
-                if (testAccomplice.charsRemain())
-                {
-                    char toSend = testAccomplice.getNext();
-                    if (activeNet.SensoryMap.has(toSend))
-                    {
-                        activeNet.SensoryMap.search(
-                            toSend).
-                            Fire();
-                    }
-                }
-                int innerIterations = 0;
-                while (innerIterations < INNER_ITERATIONS_USED && continueTest)
-                {
-                    foreach (NetStructure activeComponent in activeNet.Components)
-                    {
-                        foreach(Neuron sensory in activeComponent.SensoryList)
-                        {
-                            sensory.Fire();
-                        }
-                        foreach (INode intermediate in activeComponent.Intermediates)
-                        {
-                            intermediate.Fire();
-                        }
-                        foreach (Neuron motor in activeComponent.MotorList)
-                        {
-                            motor.Fire();
-                        }
-                    }
-                    //foreach(Neuron motor in activeNet.MotorList)
-                    //{
-                    //    motor.Fire();
-                    //}
-                    innerIterations++;
-                }
-                outerIterations++;
-
-            }
-            return outerIterations;
-        }
+        
 
         // Indicates that the instance has
         // completed all needed tests

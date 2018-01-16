@@ -141,6 +141,10 @@ namespace Logic
             {
                 int j = canConnectTo.Length;
                 int componentIndex = rng.Next(canConnectTo.Length);
+                if(componentIndex > canConnectTo.Length - 3)
+                {
+                    var test = "test";
+                }
                 var targetNode = canConnectTo[componentIndex];
                 var newMotorIndex = rng.Next(mightMutate.MotorCount);
                 var sensosryIndex = rng.Next(targetNode.SensoryCount);
